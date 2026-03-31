@@ -313,7 +313,7 @@
 </div>
 
 <script>
-const GEMINI_API_KEY = "AIzaSyBo4oOwx_yAAYdfz1MH6qiwxQrPjSZU5zA";
+const GEMINI_API_KEY = "AIzaSyBPvmDF7JMLbCKjHNAVBx11d2CNjE-nzUk";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SHOP_SCHEDULE = {
@@ -422,20 +422,46 @@ let chatHistory = [];
 
 async function callGemini(msg) {
   chatHistory.push({role:'user',parts:[{text:msg}]});
-  const res = await fetch(GEMINI_URL, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
-      contents: chatHistory,
-      generationConfig:{temperature:0.7,maxOutputTokens:600}
-    })
-  });
-  if(!res.ok) throw new Error(`${res.status}`);
+
+  let res;
+  try {
+    res = await fetch(GEMINI_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
+        contents: chatHistory,
+        generationConfig:{temperature:0.7,maxOutputTokens:600}
+      })
+    });
+  } catch(networkErr) {
+    // fetch itself failed — no internet
+    chatHistory.pop();
+    throw { type: 'network' };
+  }
+
+  if(!res.ok) {
+    chatHistory.pop();
+    throw { type: 'api', status: res.status };
+  }
+
   const data = await res.json();
   const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, couldn't get a response. Please try again.";
   chatHistory.push({role:'model',parts:[{text:reply}]});
   return reply;
+}
+
+function getErrorMsg(err) {
+  if(err.type === 'network') {
+    return '📶 No internet connection. Please check your WiFi or mobile data and try again.';
+  }
+  if(err.type === 'api') {
+    if(err.status === 401 || err.status === 403) return '🔑 API key issue. Please contact shop support.';
+    if(err.status === 429) return '⏳ Too many requests. Please wait a moment and try again.';
+    if(err.status >= 500) return '🔧 Gemini server is temporarily down. Please try again in a few seconds.';
+    return `❌ Something went wrong (Error ${err.status}). Please try again or call us at +92 300-1234567.`;
+  }
+  return '⚠️ Unexpected error. Please try again or call us at +92 300-1234567.';
 }
 
 function fmtBot(text) {
@@ -484,7 +510,7 @@ async function sendMessage() {
     removeTyping(); appendMsg('bot', reply);
   } catch(e) {
     removeTyping();
-    appendMsg('bot','⚠️ Connection issue. Please try again or call us at +92 300-1234567.');
+    appendMsg('bot', getErrorMsg(e));
   }
   btn.disabled=false;
 }
