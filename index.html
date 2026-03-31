@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TireXpert - Shop Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
 <style>
@@ -22,33 +22,38 @@
     --white: #FAFAF8;
     --border: rgba(255,255,255,0.08);
     --border2: rgba(255,255,255,0.15);
-    --accent-glow: rgba(224,32,32,0.15);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
 
   body {
     background: var(--black);
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    height: 100dvh;
   }
 
   /* HEADER */
   .header {
     background: var(--dark);
     border-bottom: 1px solid var(--border2);
-    padding: 0 20px;
-    height: 64px;
+    padding: 0 16px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     position: relative;
     overflow: hidden;
+    z-index: 10;
   }
   .header::before {
     content: '';
@@ -56,223 +61,126 @@
     top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--red), var(--red-light), var(--red), transparent);
   }
-  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-left { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
-    width: 40px; height: 40px;
+    width: 36px; height: 36px;
     background: var(--red);
-    border-radius: 10px;
+    border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+    font-size: 18px; flex-shrink: 0;
   }
-  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
-  .logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; line-height: 1; }
+  .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
   .status-badge {
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 5px;
     background: rgba(34,197,94,0.1);
     border: 1px solid rgba(34,197,94,0.3);
     border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    color: #4ade80;
+    padding: 4px 10px;
+    font-size: 11px; color: #4ade80;
+    white-space: nowrap;
   }
   .status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
+    width: 5px; height: 5px; border-radius: 50%;
     background: #4ade80;
-    animation: pulse 2s infinite;
+    animation: pulse 2s infinite; flex-shrink: 0;
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.8); }
   }
 
-  /* MAIN LAYOUT */
-  .main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
+  /* MOBILE INFO STRIP */
+  .mobile-info-strip {
+    display: none;
+    background: var(--dark2);
+    border-bottom: 1px solid var(--border);
+    padding: 7px 14px;
+    gap: 18px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-info-strip::-webkit-scrollbar { display: none; }
+  @media (max-width: 768px) { .mobile-info-strip { display: flex; } }
+  .strip-item {
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap; font-size: 12px; color: var(--text2); flex-shrink: 0;
   }
 
-  /* SIDEBAR */
+  /* MAIN LAYOUT */
+  .main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+  /* SIDEBAR — desktop only */
   .sidebar {
-    width: 260px;
-    background: var(--dark);
+    width: 240px; background: var(--dark);
     border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    overflow-y: auto;
+    display: flex; flex-direction: column;
+    flex-shrink: 0; overflow-y: auto;
   }
   @media (max-width: 768px) { .sidebar { display: none; } }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 4px; }
 
-  .sidebar-section {
-    padding: 20px 16px 12px;
-  }
-  .sidebar-title {
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-  }
-  .shop-info-card {
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 8px;
-  }
-  .info-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
+  .sidebar-section { padding: 16px 14px 10px; }
+  .sidebar-title { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .shop-info-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+  .info-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .info-row:last-child { border-bottom: none; }
-  .info-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
-  .info-label { color: var(--muted); font-size: 11px; }
-  .info-val { color: var(--text); font-weight: 500; }
-  .open-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(34,197,94,0.15);
-    color: #4ade80;
-    border: 1px solid rgba(34,197,94,0.3);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 11px; font-weight: 600;
-  }
-  .closed-badge {
-    background: rgba(239,68,68,0.15);
-    color: #f87171;
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 11px; font-weight: 600;
-  }
-
-  .quick-btn {
-    width: 100%;
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 9px 12px;
-    text-align: left;
-    color: var(--text2);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 8px;
-    transition: all 0.2s;
-  }
-  .quick-btn:hover {
-    background: var(--gray);
-    border-color: var(--border2);
-    color: var(--text);
-  }
-  .quick-btn span { font-size: 15px; }
+  .info-icon { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+  .info-label { color: var(--muted); font-size: 10px; }
+  .info-val { color: var(--text); font-weight: 500; font-size: 12px; }
+  .open-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+  .closed-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+  .quick-btn { width: 100%; background: var(--dark2); border: 1px solid var(--border); border-radius: 7px; padding: 8px 10px; text-align: left; color: var(--text2); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-bottom: 5px; display: flex; align-items: center; gap: 7px; transition: all 0.2s; }
+  .quick-btn:hover { background: var(--gray); border-color: var(--border2); color: var(--text); }
+  .quick-btn span { font-size: 14px; }
 
   /* CHAT AREA */
   .chat-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden; min-width: 0; min-height: 0;
     background: var(--black);
     background-image: radial-gradient(ellipse at 50% 0%, rgba(224,32,32,0.04) 0%, transparent 60%);
   }
 
   /* MESSAGES */
   .messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 14px 12px; display: flex; flex-direction: column;
+    gap: 12px; min-height: 0; -webkit-overflow-scrolling: touch;
   }
-  .messages::-webkit-scrollbar { width: 4px; }
-  .messages::-webkit-scrollbar-track { background: transparent; }
+  @media (min-width: 769px) { .messages { padding: 20px; gap: 16px; } }
+  .messages::-webkit-scrollbar { width: 3px; }
   .messages::-webkit-scrollbar-thumb { background: var(--gray); border-radius: 4px; }
 
   /* WELCOME */
   .welcome-card {
-    background: var(--dark2);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    padding: 24px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    background: var(--dark2); border: 1px solid var(--border2);
+    border-radius: 14px; padding: 18px 14px; text-align: center;
+    position: relative; overflow: hidden;
   }
-  .welcome-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-  }
-  .welcome-icon { font-size: 36px; margin-bottom: 12px; }
-  .welcome-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-  }
+  .welcome-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
+  .welcome-icon { font-size: 28px; margin-bottom: 8px; }
+  .welcome-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 6px; }
   .welcome-title span { color: var(--red-light); }
-  .welcome-desc { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
-  .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .chip {
-    background: var(--dark);
-    border: 1px solid var(--border2);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .chip:hover {
-    background: var(--red);
-    border-color: var(--red);
-    color: white;
-  }
+  .welcome-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+  .chip { background: var(--dark); border: 1px solid var(--border2); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .chip:hover, .chip:active { background: var(--red); border-color: var(--red); color: white; }
 
   /* MESSAGE BUBBLES */
-  .msg { display: flex; gap: 10px; animation: fadeUp 0.3s ease; }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .msg { display: flex; gap: 8px; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   .msg.user { flex-direction: row-reverse; }
-
-  .avatar {
-    width: 34px; height: 34px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
-  }
+  .avatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
   .avatar.bot { background: var(--red); }
   .avatar.user { background: var(--gray2); }
-
-  .bubble {
-    max-width: 72%;
-    border-radius: 14px;
-    padding: 11px 15px;
-    font-size: 14px;
-    line-height: 1.65;
-  }
-  @media (max-width: 768px) { .bubble { max-width: 85%; } }
-  .bubble.bot {
-    background: var(--dark2);
-    border: 1px solid var(--border);
-    border-top-left-radius: 4px;
-    color: var(--text);
-  }
-  .bubble.user {
-    background: var(--red);
-    border-top-right-radius: 4px;
-    color: white;
-  }
-  .bubble p { margin-bottom: 8px; }
+  .bubble { max-width: 80%; border-radius: 14px; padding: 10px 13px; font-size: 14px; line-height: 1.65; word-break: break-word; }
+  @media (max-width: 480px) { .bubble { max-width: 88%; font-size: 13.5px; } }
+  .bubble.bot { background: var(--dark2); border: 1px solid var(--border); border-top-left-radius: 4px; color: var(--text); }
+  .bubble.user { background: var(--red); border-top-right-radius: 4px; color: white; }
+  .bubble p { margin-bottom: 6px; }
   .bubble p:last-child { margin-bottom: 0; }
   .bubble strong { color: var(--red-light); font-weight: 600; }
   .bubble.user strong { color: rgba(255,255,255,0.9); }
@@ -280,74 +188,44 @@
   .bubble li { margin-bottom: 3px; }
 
   /* TYPING */
-  .typing-indicator {
-    display: flex; align-items: center; gap: 5px;
-    padding: 12px 15px;
-  }
-  .typing-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--muted);
-    animation: typing 1.4s infinite;
-  }
+  .typing-indicator { display: flex; align-items: center; gap: 5px; padding: 10px 13px; }
+  .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: typing 1.4s infinite; }
   .typing-dot:nth-child(2) { animation-delay: 0.2s; }
   .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes typing {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
-    40% { transform: translateY(-6px); opacity: 1; }
-  }
+  @keyframes typing { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-6px); opacity: 1; } }
 
-  /* INPUT */
+  /* MOBILE QUICK CHIPS */
+  .mobile-chips {
+    display: none; padding: 8px 12px; gap: 7px;
+    overflow-x: auto; flex-shrink: 0;
+    border-top: 1px solid var(--border);
+    background: var(--dark);
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-chips::-webkit-scrollbar { display: none; }
+  @media (max-width: 768px) { .mobile-chips { display: flex; } }
+  .mchip { background: var(--dark2); border: 1px solid var(--border2); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text2); cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .mchip:active { background: var(--red); border-color: var(--red); color: white; }
+
+  /* INPUT AREA */
   .input-area {
-    padding: 16px 20px 20px;
+    padding: 10px 12px 12px;
     background: var(--dark);
     border-top: 1px solid var(--border);
     flex-shrink: 0;
   }
-  .input-wrap {
-    display: flex; gap: 10px; align-items: flex-end;
-    background: var(--dark2);
-    border: 1px solid var(--border2);
-    border-radius: 14px;
-    padding: 10px 12px;
-    transition: border-color 0.2s;
+  @media (min-width: 769px) { .input-area { padding: 12px 20px 16px; } }
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .input-area { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
   }
+  .input-wrap { display: flex; gap: 8px; align-items: flex-end; background: var(--dark2); border: 1px solid var(--border2); border-radius: 14px; padding: 8px 10px; transition: border-color 0.2s; }
   .input-wrap:focus-within { border-color: var(--red); }
-  #userInput {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    resize: none;
-    max-height: 120px;
-    min-height: 24px;
-    line-height: 1.5;
-  }
+  #userInput { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; resize: none; max-height: 100px; min-height: 22px; line-height: 1.5; -webkit-appearance: none; }
   #userInput::placeholder { color: var(--muted); }
-  .send-btn {
-    width: 36px; height: 36px;
-    background: var(--red);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-  .send-btn:hover { background: var(--red-light); transform: scale(1.05); }
-  .send-btn:disabled { background: var(--gray); cursor: not-allowed; transform: none; opacity: 0.5; }
-
-  .input-footer {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 8px;
-    font-size: 11px;
-    color: var(--muted);
-    padding: 0 4px;
-  }
+  .send-btn { width: 36px; height: 36px; background: var(--red); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .send-btn:active { transform: scale(0.93); }
+  .send-btn:disabled { background: var(--gray); cursor: not-allowed; opacity: 0.5; }
+  .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10px; color: var(--muted); padding: 0 2px; }
 </style>
 </head>
 <body>
@@ -366,73 +244,41 @@
   </div>
 </div>
 
+<div class="mobile-info-strip">
+  <div class="strip-item">📍 Sargodha Road, Faisalabad</div>
+  <div class="strip-item">📞 +92 300-1234567</div>
+  <div class="strip-item">🕐 <span id="stripHours">Loading...</span></div>
+  <div class="strip-item" id="stripStatus"></div>
+</div>
+
 <div class="main">
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-section">
       <div class="sidebar-title">Shop Info</div>
       <div class="shop-info-card">
-        <div class="info-row">
-          <div class="info-icon">📍</div>
-          <div>
-            <div class="info-label">Location</div>
-            <div class="info-val">Sargodha Road, Faisalabad</div>
-          </div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon">📞</div>
-          <div>
-            <div class="info-label">Phone</div>
-            <div class="info-val">+92 300-1234567</div>
-          </div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon">🕐</div>
-          <div>
-            <div class="info-label">Today's Hours</div>
-            <div id="todayHours" class="info-val">Loading...</div>
-          </div>
-        </div>
-        <div class="info-row">
-          <div class="info-icon">✅</div>
-          <div>
-            <div class="info-label">Status</div>
-            <div id="statusDisplay">—</div>
-          </div>
-        </div>
+        <div class="info-row"><div class="info-icon">📍</div><div><div class="info-label">Location</div><div class="info-val">Sargodha Road, Faisalabad</div></div></div>
+        <div class="info-row"><div class="info-icon">📞</div><div><div class="info-label">Phone</div><div class="info-val">+92 300-1234567</div></div></div>
+        <div class="info-row"><div class="info-icon">🕐</div><div><div class="info-label">Today's Hours</div><div id="todayHours" class="info-val">Loading...</div></div></div>
+        <div class="info-row"><div class="info-icon">✅</div><div><div class="info-label">Status</div><div id="statusDisplay">—</div></div></div>
       </div>
     </div>
-
     <div class="sidebar-section">
       <div class="sidebar-title">Quick Questions</div>
-      <button class="quick-btn" onclick="sendQuick('What tires are available for my car?')">
-        <span>🛞</span> Tire availability
-      </button>
-      <button class="quick-btn" onclick="sendQuick('What are your shop timings?')">
-        <span>🕐</span> Shop timings
-      </button>
-      <button class="quick-btn" onclick="sendQuick('Do you offer tire fitting and balancing?')">
-        <span>🔧</span> Services offered
-      </button>
-      <button class="quick-btn" onclick="sendQuick('What brands do you carry?')">
-        <span>🏷️</span> Tire brands
-      </button>
-      <button class="quick-btn" onclick="sendQuick('How much does a tire change cost?')">
-        <span>💰</span> Pricing info
-      </button>
-      <button class="quick-btn" onclick="sendQuick('Do I need an appointment?')">
-        <span>📅</span> Appointment needed?
-      </button>
+      <button class="quick-btn" onclick="sendQuick('What tires are available for my car?')"><span>🛞</span> Tire availability</button>
+      <button class="quick-btn" onclick="sendQuick('What are your shop timings?')"><span>🕐</span> Shop timings</button>
+      <button class="quick-btn" onclick="sendQuick('Do you offer tire fitting and balancing?')"><span>🔧</span> Services offered</button>
+      <button class="quick-btn" onclick="sendQuick('What brands do you carry?')"><span>🏷️</span> Tire brands</button>
+      <button class="quick-btn" onclick="sendQuick('How much does a tire change cost?')"><span>💰</span> Pricing info</button>
+      <button class="quick-btn" onclick="sendQuick('Do I need an appointment?')"><span>📅</span> Appointment needed?</button>
     </div>
   </div>
 
-  <!-- CHAT -->
   <div class="chat-area">
     <div class="messages" id="messages">
       <div class="welcome-card">
         <div class="welcome-icon">🛞</div>
         <div class="welcome-title">Welcome to <span>TireXpert</span></div>
-        <div class="welcome-desc">I'm your AI shop assistant. Ask me about tire availability, prices, services, or shop hours — I'm here to help!</div>
+        <div class="welcome-desc">I'm your AI shop assistant. Ask me about tire availability, prices, services, or shop hours!</div>
         <div class="chip-grid">
           <div class="chip" onclick="sendQuick('Is the shop open right now?')">Is shop open?</div>
           <div class="chip" onclick="sendQuick('What tire sizes do you have in stock?')">Tire sizes in stock</div>
@@ -444,9 +290,18 @@
       </div>
     </div>
 
+    <div class="mobile-chips">
+      <div class="mchip" onclick="sendQuick('Is the shop open right now?')">🕐 Open now?</div>
+      <div class="mchip" onclick="sendQuick('What tire sizes do you have?')">🛞 Tire sizes</div>
+      <div class="mchip" onclick="sendQuick('What are your prices?')">💰 Prices</div>
+      <div class="mchip" onclick="sendQuick('What brands do you carry?')">🏷️ Brands</div>
+      <div class="mchip" onclick="sendQuick('Do you do wheel alignment?')">🔧 Alignment</div>
+      <div class="mchip" onclick="sendQuick('Do I need an appointment?')">📅 Appointment?</div>
+    </div>
+
     <div class="input-area">
       <div class="input-wrap">
-        <textarea id="userInput" rows="1" placeholder="Ask about tires, services, availability..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <textarea id="userInput" rows="1" placeholder="Ask about tires, services, timings..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
       </div>
       <div class="input-footer">
@@ -462,58 +317,67 @@ const GEMINI_API_KEY = "AIzaSyBo4oOwx_yAAYdfz1MH6qiwxQrPjSZU5zA";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SHOP_SCHEDULE = {
-  0: { day: 'Sunday',    open: '09:00', close: '17:00' },
-  1: { day: 'Monday',    open: '08:00', close: '20:00' },
-  2: { day: 'Tuesday',   open: '08:00', close: '20:00' },
-  3: { day: 'Wednesday', open: '08:00', close: '20:00' },
-  4: { day: 'Thursday',  open: '08:00', close: '20:00' },
-  5: { day: 'Friday',    open: '08:00', close: '13:00' },
-  6: { day: 'Saturday',  open: '08:00', close: '18:00' },
+  0:{day:'Sunday',open:'09:00',close:'17:00'},
+  1:{day:'Monday',open:'08:00',close:'20:00'},
+  2:{day:'Tuesday',open:'08:00',close:'20:00'},
+  3:{day:'Wednesday',open:'08:00',close:'20:00'},
+  4:{day:'Thursday',open:'08:00',close:'20:00'},
+  5:{day:'Friday',open:'08:00',close:'13:00'},
+  6:{day:'Saturday',open:'08:00',close:'18:00'},
 };
 
 function getShopStatus() {
   const now = new Date();
-  const dayInfo = SHOP_SCHEDULE[now.getDay()];
-  const currentMins = now.getHours() * 60 + now.getMinutes();
-  const [oh, om] = dayInfo.open.split(':').map(Number);
-  const [ch, cm] = dayInfo.close.split(':').map(Number);
-  const openMins = oh * 60 + om;
-  const closeMins = ch * 60 + cm;
-  const isOpen = currentMins >= openMins && currentMins < closeMins;
-  return { isOpen, dayInfo, now };
+  const d = SHOP_SCHEDULE[now.getDay()];
+  const cur = now.getHours()*60+now.getMinutes();
+  const [oh,om] = d.open.split(':').map(Number);
+  const [ch,cm] = d.close.split(':').map(Number);
+  return { isOpen: cur>=(oh*60+om) && cur<(ch*60+cm), dayInfo: d };
 }
 
-function formatTime12(time24) {
-  const [h, m] = time24.split(':').map(Number);
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${ampm}`;
+function fmt12(t) {
+  const [h,m] = t.split(':').map(Number);
+  return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`;
 }
 
 function updateShopUI() {
-  const { isOpen, dayInfo } = getShopStatus();
-  const hours = `${formatTime12(dayInfo.open)} – ${formatTime12(dayInfo.close)}`;
-  document.getElementById('todayHours').textContent = hours;
-  const statusEl = document.getElementById('statusDisplay');
-  const headerStatus = document.getElementById('shopStatus');
-  if (isOpen) {
-    statusEl.innerHTML = `<span class="open-badge">● Open</span>`;
-    headerStatus.textContent = 'Open Now';
-  } else {
-    statusEl.innerHTML = `<span class="closed-badge">● Closed</span>`;
-    headerStatus.textContent = 'Closed';
+  const {isOpen, dayInfo} = getShopStatus();
+  const hours = `${fmt12(dayInfo.open)} – ${fmt12(dayInfo.close)}`;
+  const ob = `<span class="open-badge">● Open</span>`;
+  const cb = `<span class="closed-badge">● Closed</span>`;
+
+  const th = document.getElementById('todayHours');
+  if(th) th.textContent = hours;
+  const sd = document.getElementById('statusDisplay');
+  if(sd) sd.innerHTML = isOpen ? ob : cb;
+
+  document.getElementById('shopStatus').textContent = isOpen ? 'Open Now' : 'Closed';
+  const badge = document.querySelector('.status-badge');
+  const dot = document.querySelector('.status-dot');
+  if(badge) {
+    badge.style.cssText = isOpen
+      ? 'background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#4ade80'
+      : 'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171';
+    badge.style.display='flex'; badge.style.alignItems='center'; badge.style.gap='5px'; badge.style.borderRadius='20px'; badge.style.padding='4px 10px'; badge.style.fontSize='11px'; badge.style.whiteSpace='nowrap';
   }
+  if(dot) dot.style.background = isOpen ? '#4ade80' : '#f87171';
+
+  const sh = document.getElementById('stripHours');
+  if(sh) sh.textContent = hours;
+  const ss = document.getElementById('stripStatus');
+  if(ss) ss.innerHTML = isOpen ? ob : cb;
 }
 
 function updateTime() {
-  const now = new Date();
-  document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' });
+  const el = document.getElementById('timeDisplay');
+  if(el) el.textContent = new Date().toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit'});
 }
 
-updateShopUI();
-updateTime();
+updateShopUI(); updateTime();
 setInterval(updateTime, 60000);
+setInterval(updateShopUI, 60000);
 
-const SYSTEM_PROMPT = `You are TireXpert's AI shop assistant — a knowledgeable, friendly, and professional tire shop helper.
+const SYSTEM_PROMPT = `You are TireXpert's AI shop assistant — knowledgeable, friendly, and professional.
 
 SHOP INFORMATION:
 - Name: TireXpert Tire & Auto Service
@@ -527,13 +391,13 @@ SHOP SCHEDULE:
 - Saturday: 8:00 AM – 6:00 PM
 - Sunday: 9:00 AM – 5:00 PM
 
-TIRE INVENTORY (Available Brands & Types):
+TIRE INVENTORY:
 - Bridgestone: All sizes, passenger & SUV, Rs.12,000–28,000
 - Yokohama: 13"–18" rims, Rs.10,500–24,000
 - General Tyre (local): Economy range, Rs.7,000–15,000
 - Hankook: Mid-range, Rs.9,000–22,000
-- Pirelli: Premium range available on order, Rs.18,000–40,000
-- Motorcycle tires: All sizes in stock Rs.2,500–6,000
+- Pirelli: Premium, available on order, Rs.18,000–40,000
+- Motorcycle tires: All sizes, Rs.2,500–6,000
 - Truck/Commercial: Available, pricing on request
 
 POPULAR SIZES IN STOCK: 155/65R13, 165/70R13, 175/70R13, 185/65R15, 195/55R15, 205/55R16, 215/60R16, 225/45R17, 235/55R18
@@ -544,65 +408,53 @@ SERVICES:
 - Wheel alignment (computerized): Rs.1,500–2,500
 - Tire rotation: Rs.800 flat
 - Puncture repair: Rs.200–500
-- Free tire pressure check
-- Free visual inspection with every service
+- Free tire pressure check & visual inspection
 
 POLICIES:
-- Walk-ins welcome, no appointment needed for standard services
+- Walk-ins welcome, no appointment for standard services
 - Appointments recommended for full sets and alignment
 - Payment: Cash, EasyPaisa, JazzCash, Bank Transfer
 - Warranty: 6 months on fitting workmanship
-- Tire warranty as per manufacturer
 
-RESPONSE STYLE:
-- Be warm, helpful, and professional
-- Use Pakistani context naturally (mention PKR prices, local brands)
-- If asked about current open/close status, note that you have access to today's schedule
-- For very specific custom orders or bulk pricing, advise calling the shop
-- Keep responses concise but complete — use bullet points for lists
-- If user seems ready to visit, encourage them and mention walk-ins are welcome
-- Never make up prices or availability you're not sure of — say "please call us for exact pricing"`;
+STYLE: Warm, professional, use PKR prices, bullet points for lists, encourage walk-ins. If unsure about pricing say "please call us for exact pricing".`;
 
 let chatHistory = [];
 
-async function callGemini(userMessage) {
-  chatHistory.push({ role: 'user', parts: [{ text: userMessage }] });
-  const body = {
-    system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
-    contents: chatHistory,
-    generationConfig: { temperature: 0.7, maxOutputTokens: 600 }
-  };
+async function callGemini(msg) {
+  chatHistory.push({role:'user',parts:[{text:msg}]});
   const res = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
+      contents: chatHistory,
+      generationConfig:{temperature:0.7,maxOutputTokens:600}
+    })
   });
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  if(!res.ok) throw new Error(`${res.status}`);
   const data = await res.json();
-  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't get a response. Please try again.";
-  chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, couldn't get a response. Please try again.";
+  chatHistory.push({role:'model',parts:[{text:reply}]});
   return reply;
 }
 
-function formatBotText(text) {
+function fmtBot(text) {
   return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n- /g, '<br>• ')
-    .replace(/\n/g, '<br>');
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n- /g,'<br>• ')
+    .replace(/\n/g,'<br>');
 }
 
 function appendMsg(role, text) {
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = `msg ${role}`;
-  const isBot = role === 'bot';
-  const bubbleContent = isBot ? `<p>${formatBotText(text)}</p>` : text;
+  const isBot = role==='bot';
   div.innerHTML = `
-    <div class="avatar ${role}">${isBot ? '🛞' : '👤'}</div>
-    <div class="bubble ${role}">${bubbleContent}</div>
-  `;
+    <div class="avatar ${role}">${isBot?'🛞':'👤'}</div>
+    <div class="bubble ${role}">${isBot?`<p>${fmtBot(text)}</p>`:text}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -610,69 +462,36 @@ function appendMsg(role, text) {
 function showTyping() {
   const msgs = document.getElementById('messages');
   const div = document.createElement('div');
-  div.className = 'msg bot';
-  div.id = 'typingMsg';
-  div.innerHTML = `
-    <div class="avatar bot">🛞</div>
-    <div class="bubble bot">
-      <div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-    </div>
-  `;
+  div.className='msg bot'; div.id='typingMsg';
+  div.innerHTML=`<div class="avatar bot">🛞</div><div class="bubble bot"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function removeTyping() {
-  const t = document.getElementById('typingMsg');
-  if (t) t.remove();
-}
+function removeTyping() { const t=document.getElementById('typingMsg'); if(t) t.remove(); }
 
 async function sendMessage() {
   const input = document.getElementById('userInput');
   const btn = document.getElementById('sendBtn');
   const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  input.style.height = 'auto';
-  btn.disabled = true;
-
+  if(!text) return;
+  input.value=''; input.style.height='auto';
+  btn.disabled=true; input.blur();
   appendMsg('user', text);
   showTyping();
-
   try {
     const reply = await callGemini(text);
+    removeTyping(); appendMsg('bot', reply);
+  } catch(e) {
     removeTyping();
-    appendMsg('bot', reply);
-  } catch (err) {
-    removeTyping();
-    appendMsg('bot', '⚠️ Connection issue. Please check your internet and try again, or call us at +92 300-1234567.');
+    appendMsg('bot','⚠️ Connection issue. Please try again or call us at +92 300-1234567.');
   }
-
-  btn.disabled = false;
-  input.focus();
+  btn.disabled=false;
 }
 
-function sendQuick(text) {
-  document.getElementById('userInput').value = text;
-  sendMessage();
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
+function sendQuick(text) { document.getElementById('userInput').value=text; sendMessage(); }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 </script>
 </body>
 </html>
