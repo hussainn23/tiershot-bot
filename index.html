@@ -313,7 +313,7 @@
 </div>
 
 <script>
-const GEMINI_API_KEY = "AIzaSyBPvmDF7JMLbCKjHNAVBx11d2CNjE-nzUk";
+const GEMINI_API_KEY = "AIzaSyB31Wi1p9uvg8HNGH3bRkUHkQYM1Q7xEvk";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 const SHOP_SCHEDULE = {
@@ -420,35 +420,73 @@ STYLE: Warm, professional, use PKR prices, bullet points for lists, encourage wa
 
 let chatHistory = [];
 
+async function callGeminiOnce() {
+  const res = await fetch(GEMINI_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
+      contents: chatHistory,
+      generationConfig:{temperature:0.7,maxOutputTokens:600}
+    })
+  });
+  return res;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
 async function callGemini(msg) {
   chatHistory.push({role:'user',parts:[{text:msg}]});
 
   let res;
-  try {
-    res = await fetch(GEMINI_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
-        contents: chatHistory,
-        generationConfig:{temperature:0.7,maxOutputTokens:600}
-      })
-    });
-  } catch(networkErr) {
-    // fetch itself failed — no internet
-    chatHistory.pop();
-    throw { type: 'network' };
-  }
+  const maxRetries = 3;
+  const retryDelays = [3000, 6000, 12000]; // 3s, 6s, 12s
 
-  if(!res.ok) {
-    chatHistory.pop();
-    throw { type: 'api', status: res.status };
-  }
+  for(let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      res = await callGeminiOnce();
+    } catch(networkErr) {
+      chatHistory.pop();
+      throw { type: 'network' };
+    }
 
-  const data = await res.json();
-  const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, couldn't get a response. Please try again.";
-  chatHistory.push({role:'model',parts:[{text:reply}]});
-  return reply;
+    // 429 — wait and retry
+    if(res.status === 429) {
+      if(attempt < maxRetries - 1) {
+        updateTypingMsg(`⏳ Rate limit hit, retrying in ${retryDelays[attempt]/1000}s...`);
+        await sleep(retryDelays[attempt]);
+        updateTypingMsg(''); // back to normal dots
+        continue;
+      } else {
+        chatHistory.pop();
+        throw { type: 'api', status: 429 };
+      }
+    }
+
+    // other errors
+    if(!res.ok) {
+      chatHistory.pop();
+      throw { type: 'api', status: res.status };
+    }
+
+    // success
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, couldn't get a response. Please try again.";
+    chatHistory.push({role:'model',parts:[{text:reply}]});
+    return reply;
+  }
+}
+
+function updateTypingMsg(text) {
+  const t = document.getElementById('typingMsg');
+  if(!t) return;
+  const bubble = t.querySelector('.bubble');
+  if(!bubble) return;
+  if(text) {
+    bubble.innerHTML = `<p style="font-size:13px;color:var(--muted)">${text}</p>`;
+  } else {
+    bubble.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  }
 }
 
 function getErrorMsg(err) {
